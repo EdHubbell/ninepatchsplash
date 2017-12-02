@@ -1,0 +1,14 @@
+{
+  "name": "ninepatchify",
+  "version": "1.0.0",
+  "description": "modifies a png file to make it a ninepatch file",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "gsdware llc",
+  "license": "ISC",
+  "dependencies": {
+    "jimp": "^0.2.28"
+  }
+}
