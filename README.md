@@ -8,3 +8,8 @@ To run it:
 node index.js 1024.png
 
 Code is pretty simple. 
+
+Change Notes:
+Edited in March 2018 because the 9 patch images on my Pixel didn't stretch all the way into 
+the upper left hand corner. So we make full rectangular images now instead of square ones that 
+we expect to stretch properly.

@@ -24,34 +24,37 @@ Jimp.read(args[0], function (err, image) {
   // XXXHDPI is 4 x MDPI = 1280x1920px
 
   // We'll use 256 here for the nice rescale factor of 4 down from 1024.
-  make9p(image.clone(), "MDPI_splashscreen.9.png", 256);
+  make9p(image.clone(), "MDPI_splashscreen.9.png", 256, 320, 480);
   // Normally we can just take 20 off the width and use that.  
-  make9p(image.clone(), "LDPI_splashscreen.9.png", 220);
-  make9p(image.clone(), "HDPI_splashscreen.9.png", 460);
-  make9p(image.clone(), "XHDPI_splashscreen.9.png", 620);
-  make9p(image.clone(), "XXHDPI_splashscreen.9.png", 940);
-  // For the big one, don't resize at all.
-  make9p(image.clone(), "XXXHDPI_splashscreen.9.png", 1024);
+  make9p(image.clone(), "LDPI_splashscreen.9.png", 200, 200, 320);
+  make9p(image.clone(), "HDPI_splashscreen.9.png", 460, 480, 800);
+  make9p(image.clone(), "XHDPI_splashscreen.9.png", 620, 720, 1280);
+  make9p(image.clone(), "XXHDPI_splashscreen.9.png", 940, 960, 1600);
+  // // For the big one, don't resize at all.
+  make9p(image.clone(), "XXXHDPI_splashscreen.9.png", 1024, 1280, 1920);
 
 
 });
 
 
 
-function make9p(image, filename, imageSize) {
+function make9p(image, filename, imageSize, splashWidth, splashHeight) {
 
+  // Resize the source image so it will fit on the splash. Square image. 
+  // Based use of bicubic method on this post: https://blog.codinghorror.com/better-image-resizing/
+  image.resize(imageSize, imageSize, Jimp.RESIZE_BICUBIC);
 
-  image.resize(imageSize, imageSize);
+  // Get the image background color so we know what to fill in.
+  // This just assumes that the upper left corner is the same as the rest of the image. 
+  var backColor = image.getPixelColor(0,0)
 
-  var ninepWidth = image.bitmap.width + 2;
-  var ninepHeight = image.bitmap.height + 2;
+  var ninepWidth = splashWidth + 2;
+  var ninepHeight = splashHeight + 2;
 
-  
   var imageNew = new Jimp(ninepWidth, ninepHeight, 0xFFFFFF00, function (err, imageNew) {
     if (err) throw err;
 
-
-    // Set the correct pixels so the borders of the image will stretch.
+    // Set the correct pixels so the borders of the 9 patch image will stretch.
     // Remember that the source image should have a consistent border color.
     imageNew.setPixelColor(0x000000FF, 1, 0); // sets the colour of that pixel
     imageNew.setPixelColor(0x000000FF, 0, 1); // sets the colour of that pixel
@@ -59,19 +62,20 @@ function make9p(image, filename, imageSize) {
     imageNew.setPixelColor(0x000000FF, ninepWidth - 2, 0); // sets the colour of that pixel
     imageNew.setPixelColor(0x000000FF, 0, ninepHeight - 2); // sets the colour of that pixel
 
-
-    // Is there a faster way? Who cares. Plenty fast and easy to read.
-
-    for (x = 0; x < image.bitmap.width; x++) {
-
-      for (y = 0; y < image.bitmap.height; y++) {
-
-        imageNew.setPixelColor(image.getPixelColor(x,y), x + 1, y + 1); // sets the colour of that pixel
-
+    // Set the background of the entire image. 
+    for (x = 0; x < ninepWidth; x++) {
+      for (y = 0; y < ninepHeight; y++) {
+        imageNew.setPixelColor(backColor, x + 1, y + 1); // sets the colour of that pixel
       }
-
     }
 
+
+    // Find where we want to paste in the square image.  
+    var xOffset =  parseInt((splashWidth - imageSize)/2);
+    var yOffset = parseInt((splashHeight - imageSize)/2);
+
+    // Paste the initial image into our larger portrait splashscreen.
+    imageNew.blit(image, xOffset, yOffset);
 
     imageNew.write(filename); // save
 
