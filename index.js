@@ -63,16 +63,16 @@ function make9p(image, filename, imageSize, splashWidth, splashHeight) {
     imageNew.setPixelColor(0x000000FF, 0, ninepHeight - 2); // sets the colour of that pixel
 
     // Set the background of the entire image. 
-    for (x = 0; x < ninepWidth; x++) {
-      for (y = 0; y < ninepHeight; y++) {
+    for (x = 0; x < ninepWidth - 2; x++) {
+      for (y = 0; y < ninepHeight - 2; y++) {
         imageNew.setPixelColor(backColor, x + 1, y + 1); // sets the colour of that pixel
       }
     }
 
 
     // Find where we want to paste in the square image.  
-    var xOffset =  parseInt((splashWidth - imageSize)/2);
-    var yOffset = parseInt((splashHeight - imageSize)/2);
+    var xOffset =  parseInt((splashWidth - imageSize)/2) + 1;
+    var yOffset = parseInt((splashHeight - imageSize)/2) + 1;
 
     // Paste the initial image into our larger portrait splashscreen.
     imageNew.blit(image, xOffset, yOffset);
